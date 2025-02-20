@@ -14,7 +14,15 @@ module.exports = {
     rules: [
       {
         test: /\.tsx?$/,
-        use: "ts-loader",
+        use: [
+          {
+            loader: "ts-loader",
+            options: {
+              configFile: "tsconfig.json",
+              transpileOnly: true,
+            },
+          },
+        ],
         exclude: /node_modules/,
       },
       {
@@ -29,6 +37,13 @@ module.exports = {
   },
   resolve: {
     extensions: [".tsx", ".ts", ".js"],
+    alias: {
+      "styled-components": path.resolve(
+        __dirname,
+        "node_modules",
+        "styled-components"
+      ),
+    },
   },
   plugins: [
     new CleanWebpackPlugin({

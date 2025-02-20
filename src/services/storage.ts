@@ -1,28 +1,50 @@
-export type SyncStorage = {
-  sessions: Sessions[];
+export type LocalStorage = {
+  sessions: Session[];
 };
 
-export type Sessions = {
+export type Session = {
+  id: string;
   name: string;
-  urls: string[];
+  tabs: Tab[];
 };
 
-export type SyncStorageKeys = keyof SyncStorage;
+export type Tab = {
+  icon: string;
+  title: string;
+  url: string;
+};
 
-export async function setSessions(sessions: Sessions[]): Promise<void> {
-  const vals: SyncStorage = {
+export type SyncStorageKeys = keyof LocalStorage;
+
+// const initialState: Session[] = [
+//   {
+//     name: "Tue 19 2025",
+//     tabs: [{ icon: "lala", url: "lala" }],
+//   },
+//   {
+//     name: "Tue 15 2025",
+//     tabs: [{ icon: "lala", url: "lala" }],
+//   },
+//   {
+//     name: "Tue 10 2025",
+//     tabs: [{ icon: "lala", url: "lala" }],
+//   },
+// ];
+
+export async function setSessionsStorage(sessions: Session[]): Promise<void> {
+  const vals: LocalStorage = {
     sessions,
   };
 
   return new Promise((resolve) => {
-    chrome.storage.sync.set(vals, () => resolve());
+    chrome.storage.local.set(vals, () => resolve());
   });
 }
 
-export function getSessions(): Promise<Sessions[]> {
+export function getSessionsStorage(): Promise<Session[]> {
   const keys: SyncStorageKeys[] = ["sessions"];
   return new Promise((resolve) => {
-    chrome.storage.sync.get(keys, (res: SyncStorage) => {
+    chrome.storage.local.get(keys, (res: { [key: string]: any }) => {
       resolve(res.sessions ?? []);
     });
   });

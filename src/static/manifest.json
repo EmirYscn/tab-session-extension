@@ -7,7 +7,7 @@
     "default_popup": "popup.html",
     "default_title": "Tab Session"
   },
-  "permissions": ["storage", "tabs"],
+  "permissions": ["storage", "tabs", "unlimitedStorage"],
   "options_page": "options.html",
   "background": {
     "service_worker": "background.js"
