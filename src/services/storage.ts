@@ -1,5 +1,6 @@
 export type LocalStorage = {
-  sessions: Session[];
+  sessions?: Session[];
+  options?: LocalStorageOptions;
 };
 
 export type Session = {
@@ -9,12 +10,17 @@ export type Session = {
 };
 
 export type Tab = {
+  id: string;
   icon: string;
   title: string;
   url: string;
 };
 
-export type SyncStorageKeys = keyof LocalStorage;
+export type LocalStorageOptions = {
+  isDark: boolean;
+};
+
+export type LocalStorageKeys = keyof LocalStorage;
 
 // const initialState: Session[] = [
 //   {
@@ -42,10 +48,31 @@ export async function setSessionsStorage(sessions: Session[]): Promise<void> {
 }
 
 export function getSessionsStorage(): Promise<Session[]> {
-  const keys: SyncStorageKeys[] = ["sessions"];
+  const keys: LocalStorageKeys[] = ["sessions"];
   return new Promise((resolve) => {
     chrome.storage.local.get(keys, (res: { [key: string]: any }) => {
       resolve(res.sessions ?? []);
+    });
+  });
+}
+
+export function setStoredOptions(options: LocalStorageOptions): Promise<void> {
+  const vals: LocalStorage = {
+    options,
+  };
+  return new Promise((resolve) => {
+    chrome.storage.local.set(vals, () => {
+      resolve();
+    });
+  });
+}
+
+export function getStoredOptions(): Promise<LocalStorageOptions> {
+  const keys: LocalStorageKeys[] = ["options"];
+
+  return new Promise((resolve) => {
+    chrome.storage.local.get(keys, (res: { [key: string]: any }) => {
+      resolve(res.options ?? { isDark: true });
     });
   });
 }

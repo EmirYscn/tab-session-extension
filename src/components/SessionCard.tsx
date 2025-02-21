@@ -1,34 +1,37 @@
-import React, { useState } from "react";
-import { motion } from "framer-motion";
+import React, { useRef, useState } from "react";
+
 import styled from "styled-components";
 import { IoIosArrowDown } from "react-icons/io";
 import { BiWindowOpen } from "react-icons/bi";
-import { FaRegWindowMaximize } from "react-icons/fa";
 import { IoTrashBinOutline } from "react-icons/io5";
+import { LuPlus } from "react-icons/lu";
 
-import { Session, setSessionsStorage } from "../services/storage";
+import {
+  LocalStorageOptions,
+  Session,
+  setSessionsStorage,
+} from "../services/storage";
 import Button from "./Button";
-import { formatString } from "../utils/formatString";
 
-const StyledSessionCard = styled.div`
-  background-color: ${(props) => props.theme.colors.grey[800]};
+import Tabs from "./Tabs";
+import { ChangeEvent, MouseEvent } from "../types/types";
+import { useOptions } from "../contexts/options/optionsContextProvider";
+
+const StyledSessionCard = styled.div<{ $isDark?: boolean }>`
+  background-color: ${(props) =>
+    props.$isDark
+      ? props.theme.colors.darkmode[100]
+      : props.theme.colors.grey[800]};
   border-radius: 6px;
-  /* display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 0.5rem; */
+
   display: flex;
   flex-direction: column;
   padding: 1rem 1.5rem;
 
-  /* & span {
-    font-size: 1rem;
-    font-weight: 500;
-  } */
-
   box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
     rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
   z-index: 99999;
+  cursor: pointer;
 `;
 
 const Card = styled.div`
@@ -55,30 +58,20 @@ const Actions = styled.div`
   gap: 0.2rem;
 `;
 
-const Tabs = styled(motion.div)`
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  height: 200px;
-  overflow-y: scroll;
-  margin: -1rem 0.8rem;
-  background-color: ${(props) => props.theme.colors.grey[800]};
-  border-radius: 6px;
-  box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
-    rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
-  padding: 0.5rem 1rem;
-  padding-top: 1rem;
-  margin-bottom: 1rem;
-`;
-
-const Tab = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-
-  & img {
-    height: 1rem;
-  }
+const Input = styled.input<{ $isDark?: boolean }>`
+  padding: 0.7rem 0.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  border-radius: 4px;
+  border: none;
+  border-bottom: 1px solid #ccc;
+  outline: none;
+  background-color: ${(props) =>
+    props.$isDark
+      ? props.theme.colors.darkmode[100]
+      : props.theme.colors.grey[800]};
+  color: ${(props) =>
+    props.$isDark ? props.theme.colors.darkmode[400] : "black"};
 
   & svg {
     height: 1rem;
@@ -98,9 +91,34 @@ function SessionCard({
   setExpandedId,
   setSessions,
 }: SessionCardProps) {
+  const { options, setOptions } = useOptions();
+  const [isEditing, setIsEditing] = useState(false);
+  const [isAddingNewTab, setIsAddingNewTab] = useState(false);
+  const [value, setValue] = useState(session.name);
+  const inputRef = useRef<HTMLInputElement>(null);
   const tabsCount = session.tabs.length;
 
-  function handleDeleteSession(id: string) {
+  function handleEdit(e: ChangeEvent) {
+    setValue(e.target.value);
+  }
+
+  function saveEdit() {
+    if (!value.trim()) {
+      setValue(session.name); // Reset if empty
+    } else {
+      setSessions((prevSessions) => {
+        const updatedSessions = prevSessions.map((prev) =>
+          prev.id === session.id ? { ...prev, name: value } : prev
+        );
+        setSessionsStorage(updatedSessions);
+        return updatedSessions;
+      });
+    }
+    setIsEditing(false);
+  }
+
+  function handleDeleteSession(e: MouseEvent, id: string) {
+    e.preventDefault();
     setSessions((prevSessions) => {
       const updatedSessions = prevSessions.filter((prev) => prev.id !== id);
       setSessionsStorage(updatedSessions);
@@ -108,22 +126,73 @@ function SessionCard({
     });
   }
 
+  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Enter") {
+      saveEdit();
+    } else if (e.key === "Escape") {
+      setValue(session.name);
+      setIsEditing(false);
+    }
+  }
+
+  function handleAddTab(e: MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!isExpanded) {
+      setExpandedId();
+    }
+    setIsAddingNewTab((isAdding) => !isAdding);
+  }
+
   return (
     <>
-      <StyledSessionCard>
+      <StyledSessionCard
+        onClick={() => {
+          if (isEditing) return;
+          setExpandedId();
+          setIsAddingNewTab(false);
+        }}
+        $isDark={options.isDark}
+      >
         <Card>
-          <span>{session.name}</span>
+          {isEditing ? (
+            <Input
+              ref={inputRef}
+              type="text"
+              value={value}
+              onChange={handleEdit}
+              onBlur={saveEdit}
+              onKeyDown={handleKeyDown}
+              autoFocus
+              $isDark={options.isDark}
+            />
+          ) : (
+            <span
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setIsEditing(true);
+                setTimeout(() => inputRef.current?.focus(), 0);
+              }}
+              style={{ padding: "0.5rem", cursor: "text" }}
+            >
+              {session.name}
+            </span>
+          )}
           <Details>
             <span>{`${tabsCount} tabs`}</span>
             <Actions>
               <Button onClick={setExpandedId}>
                 <IoIosArrowDown />
               </Button>
-              <Button>
+              <Button onClick={(e) => handleAddTab(e)}>
+                <LuPlus />
+              </Button>
+              <Button buttonType="open">
                 <BiWindowOpen />
               </Button>
               <Button
-                onClick={() => handleDeleteSession(session.id)}
+                onClick={(e: MouseEvent) => handleDeleteSession(e, session.id)}
                 buttonType="delete"
               >
                 <IoTrashBinOutline />
@@ -132,24 +201,13 @@ function SessionCard({
           </Details>
         </Card>
       </StyledSessionCard>
-      {isExpanded && (
+      {isExpanded && tabsCount > 0 && (
         <Tabs
-          initial={{ height: 0 }}
-          animate={{ height: "200px" }}
-          exit={{ height: 0 }}
-          transition={{ duration: 0.4, ease: "easeInOut" }}
-        >
-          {session.tabs.map((tab, index) => (
-            <Tab key={index}>
-              {tab.icon !== "" ? (
-                <img src={tab.icon} />
-              ) : (
-                <FaRegWindowMaximize />
-              )}
-              <a href={tab.url}>{formatString(tab.title, 40)}</a>
-            </Tab>
-          ))}
-        </Tabs>
+          session={session}
+          setSessions={setSessions}
+          isAddingNewTab={isAddingNewTab}
+          setIsAddingNewTab={setIsAddingNewTab}
+        />
       )}
     </>
   );

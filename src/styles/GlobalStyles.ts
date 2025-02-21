@@ -12,8 +12,10 @@ export const GlobalStyles = createGlobalStyle`
     --color-grey-500: #9ca3af;
     --color-grey-600: #d1d5db;
     --color-grey-700: #e5e7eb;
-    --color-grey-800: #f3f4f6;
-    --color-grey-900: #f9fafb;
+    /* --color-grey-800: #f3f4f6; */
+    --color-grey-800: #E5E1DA;
+    /* --color-grey-900: #f9fafb; */
+    --color-grey-900: #F1F0E8;
 
     --color-blue-100: #075985;
     --color-blue-700: #e0f2fe;
@@ -29,6 +31,13 @@ export const GlobalStyles = createGlobalStyle`
     --color-red-100: #fee2e2;
     --color-red-700: #b91c1c;
     --color-red-800: #991b1b;
+
+    // DARK MODE
+
+    --color-darkmode-100: #222831;
+    --color-darkmode-200: #31363F;
+    --color-darkmode-300: #76ABAE;
+    --color-darkmode-400: #EEEEEE;
 
     --backdrop-color: rgba(0, 0, 0, 0.3);
 
@@ -131,6 +140,12 @@ export const theme = {
       100: "var(--color-red-100)",
       700: "var(--color-red-700)",
       800: "var(--color-red-800)",
+    },
+    darkmode: {
+      100: "var(--color-darkmode-100)",
+      200: "var(--color-darkmode-200)",
+      300: "var(--color-darkmode-300)",
+      400: "var(--color-darkmode-400)",
     },
   },
   shadows: {
