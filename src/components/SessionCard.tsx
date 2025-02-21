@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { motion } from "framer-motion";
 import styled from "styled-components";
 import { IoIosArrowDown } from "react-icons/io";
 import { BiWindowOpen } from "react-icons/bi";
@@ -54,7 +55,7 @@ const Actions = styled.div`
   gap: 0.2rem;
 `;
 
-const Tabs = styled.div`
+const Tabs = styled(motion.div)`
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -69,6 +70,7 @@ const Tabs = styled.div`
   padding-top: 1rem;
   margin-bottom: 1rem;
 `;
+
 const Tab = styled.div`
   display: flex;
   align-items: center;
@@ -131,7 +133,12 @@ function SessionCard({
         </Card>
       </StyledSessionCard>
       {isExpanded && (
-        <Tabs>
+        <Tabs
+          initial={{ height: 0 }}
+          animate={{ height: "200px" }}
+          exit={{ height: 0 }}
+          transition={{ duration: 0.4, ease: "easeInOut" }}
+        >
           {session.tabs.map((tab, index) => (
             <Tab key={index}>
               {tab.icon !== "" ? (

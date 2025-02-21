@@ -1,5 +1,5 @@
 import React from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 
 import "./options.css";
 
@@ -7,6 +7,9 @@ const App: React.FC<{}> = () => {
   return <div>Options</div>;
 };
 
-const root = document.createElement("div");
-document.body.appendChild(root);
-ReactDOM.render(<App />, root);
+const rootElement = document.createElement("div");
+document.body.appendChild(rootElement);
+
+// Use createRoot for React 18+
+const root = createRoot(rootElement);
+root.render(<App />);

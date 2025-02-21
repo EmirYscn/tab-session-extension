@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 import { v4 as uuidv4 } from "uuid";
 import styled, { ThemeProvider } from "styled-components";
 import { GlobalStyles, theme } from "../styles/GlobalStyles";
@@ -31,6 +31,9 @@ const StyledApp = styled.div`
 // `
 
 const Main = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
   padding: 1rem;
   overflow-y: scroll;
 `;
@@ -82,10 +85,10 @@ const App: React.FC<{}> = () => {
         <GlobalStyles />
         <StyledApp>
           <Header />
-          <Button buttonType="action" onClick={getCurrentTabs}>
-            Save Session
-          </Button>
           <Main>
+            <Button buttonType="action" onClick={getCurrentTabs}>
+              Save Session
+            </Button>
             <Sessions>
               {sessions.map((session) => (
                 <SessionCard
@@ -106,6 +109,9 @@ const App: React.FC<{}> = () => {
   );
 };
 
-const root = document.createElement("div");
-document.body.appendChild(root);
-ReactDOM.render(<App />, root);
+const rootElement = document.createElement("div");
+document.body.appendChild(rootElement);
+
+// Use createRoot for React 18+
+const root = createRoot(rootElement);
+root.render(<App />);
