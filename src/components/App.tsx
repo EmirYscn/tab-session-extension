@@ -16,6 +16,8 @@ import Header from "../components/Header";
 import Button from "../components/Button";
 import { useOptions } from "../contexts/options/optionsContextProvider";
 import SortBy from "./SortBy";
+import FilterBy from "./FilterBy";
+import { formatString } from "../utils/formatString";
 
 const StyledApp = styled.div<{ $isDark?: boolean }>`
   width: 520px;
@@ -48,11 +50,42 @@ const Sessions = styled.div`
   gap: 0.5rem;
 `;
 
+const Actions = styled.div`
+  display: flex;
+  gap: 1rem;
+  align-self: flex-end;
+`;
+
+const SearchTags = styled.div`
+  display: flex;
+  flex-wrap: wrap; /* Allows tags to wrap within the container */
+  gap: 5px;
+  margin-top: 8px;
+  max-width: 100%;
+  padding-bottom: 4px;
+  align-items: center;
+  overflow-x: auto; /* Enables horizontal scrolling if necessary */
+  overflow-y: hidden; /* Prevents vertical scrolling */
+`;
+
+const Tag = styled.span`
+  background-color: ${(props) => props.theme.colors.darkmode[300]};
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  flex-shrink: 0; /* Prevents tags from shrinking */
+  white-space: nowrap; /* Ensures text inside the tag doesn’t wrap */
+  max-width: 100%;
+  text-overflow: ellipsis;
+  display: inline-block;
+`;
+
 const App: React.FC<{}> = () => {
   const [sessions, setSessions] = useState<Session[]>([]);
   const { options, setOptions } = useOptions();
 
   const [expandedId, setExpandedId] = useState("");
+  const [searchTags, setSearchTags] = useState<string[]>([]);
 
   async function getCurrentTabs() {
     const tabs = await chrome.tabs.query({
@@ -81,6 +114,11 @@ const App: React.FC<{}> = () => {
     });
   }
 
+  function handleRemoveSearchTag(tagToRemove: string) {
+    const updatedTags = searchTags.filter((tag) => tag !== tagToRemove);
+    setSearchTags(updatedTags);
+  }
+
   useEffect(() => {
     async function getSessionsFromStore() {
       const sessions = await getSessionsStorage();
@@ -96,13 +134,31 @@ const App: React.FC<{}> = () => {
   }, []);
 
   // 1) FILTER
-  // TODO: filter by tags
+  const filteredSessions = sessions.filter((session) => {
+    if (searchTags.length === 0) {
+      // If no search tags, include all sessions
+      return true;
+    }
+
+    if (session.tags) {
+      // Check if any of the session's tags partially match the search tags
+      return searchTags.every((searchTag) =>
+        session.tags?.some(
+          (sessionTag) =>
+            sessionTag.toLowerCase().includes(searchTag.toLowerCase()) // Use includes for partial matching
+        )
+      );
+    }
+
+    // If session has no tags, exclude it if there are search tags
+    return false;
+  });
 
   // 2) SORT
   const [field, direction] = options.sort?.split("-") as [string, string];
   const modifier = direction === "asc" ? 1 : -1;
 
-  let sortedSessions = [...sessions].sort((a, b) => {
+  let sortedSessions = [...filteredSessions].sort((a, b) => {
     if (field === "tab") {
       return (b.tabs.length - a.tabs.length) * modifier;
     } else if (field === "date") {
@@ -122,14 +178,41 @@ const App: React.FC<{}> = () => {
     <StyledApp $isDark={options?.isDark}>
       <Header />
       <Main>
-        <SortBy
-          options={[
-            { value: "date-asc", label: "Oldest" },
-            { value: "date-desc", label: "Newest" },
-            { value: "tab-asc", label: "Most Tabs" },
-            { value: "tab-desc", label: "Fewest Tabs" },
-          ]}
-        />
+        <Actions>
+          <FilterBy
+            addSearchTag={(tag) =>
+              setSearchTags((prevTags) => {
+                const updatedTags = new Set(prevTags); // Use Set to ensure uniqueness
+                updatedTags.add(tag.trim().toLowerCase()); // Add the new tag, automatically removing duplicates
+                return Array.from(updatedTags); // Convert Set back to an array
+              })
+            }
+          />
+          <SortBy
+            options={[
+              { value: "date-asc", label: "Oldest" },
+              { value: "date-desc", label: "Newest" },
+              { value: "tab-asc", label: "Most Tabs" },
+              { value: "tab-desc", label: "Fewest Tabs" },
+            ]}
+          />
+        </Actions>
+        <div>
+          <SearchTags>
+            {searchTags.map((tag, index) => (
+              <Tag
+                key={index}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleRemoveSearchTag(tag);
+                }}
+              >
+                {formatString(tag, 6)} ✖
+              </Tag>
+            ))}
+          </SearchTags>
+        </div>
         <Button buttonType="action" onClick={getCurrentTabs}>
           Save Session
         </Button>

@@ -9,9 +9,9 @@ export type Options = {
   label: string;
 };
 
-const StyledSortBy = styled.div`
-  align-self: flex-end;
-`;
+// const StyledSortBy = styled.div`
+//   align-self: flex-end;
+// `;
 
 function SortBy({ options }: { options: Options[] }) {
   const { options: storeOptions, setOptions } = useOptions();
@@ -30,11 +30,7 @@ function SortBy({ options }: { options: Options[] }) {
     });
   }
 
-  return (
-    <StyledSortBy>
-      <Select options={options} value={sortBy} onChange={handleChange} />
-    </StyledSortBy>
-  );
+  return <Select options={options} value={sortBy} onChange={handleChange} />;
 }
 
 export default SortBy;

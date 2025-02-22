@@ -117,9 +117,13 @@ function SessionCard({
 
   function handleAddTag(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === "Enter" && newTag.trim()) {
-      const updatedTags = [...tags, newTag.trim()];
-      setTags(updatedTags);
-      updateSessionTags(updatedTags);
+      const formattedTag = newTag.trim().toLowerCase();
+      const updatedTags = new Set(tags);
+      updatedTags.add(formattedTag);
+
+      setTags(Array.from(updatedTags)); // Convert the Set back to an array to update state
+      updateSessionTags(Array.from(updatedTags));
+
       setNewTag("");
       setIsAddingTag(false);
     }
@@ -164,6 +168,7 @@ function SessionCard({
 
   function handleDeleteSession(e: MouseEvent, id: string) {
     e.preventDefault();
+    e.stopPropagation();
     setSessions((prevSessions) => {
       const updatedSessions = prevSessions.filter((prev) => prev.id !== id);
       setSessionsStorage(updatedSessions);
@@ -189,7 +194,9 @@ function SessionCard({
     setIsAddingNewTab((isAdding) => !isAdding);
   }
 
-  function handleOpenAllTabs() {
+  function handleOpenAllTabs(e: MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
     const tabs = session.tabs;
     for (const tab of tabs) {
       chrome.tabs.create({ url: tab.url, active: false });
@@ -218,20 +225,22 @@ function SessionCard({
         }}
         $isDark={options.isDark}
       >
-        <Tags>
-          {tags.map((tag) => (
-            <Tag
-              key={tag}
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                handleRemoveTag(tag);
-              }}
-            >
-              {formatString(tag, 6)} ✖
-            </Tag>
-          ))}
-        </Tags>
+        {tags.length > 0 && (
+          <Tags>
+            {tags.map((tag, index) => (
+              <Tag
+                key={index}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleRemoveTag(tag);
+                }}
+              >
+                {formatString(tag, 6)} ✖
+              </Tag>
+            ))}
+          </Tags>
+        )}
         <Card>
           {isEditing ? (
             <Input
