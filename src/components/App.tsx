@@ -69,6 +69,7 @@ const App: React.FC<{}> = () => {
       id: uuidv4(),
       name: new Date().toDateString(),
       tabs: formattedTabs,
+      isPinned: false,
     };
 
     setSessions((prevSessions) => {
@@ -92,6 +93,10 @@ const App: React.FC<{}> = () => {
     getOptionsFromStore();
   }, []);
 
+  const sortedSessions = sessions
+    .slice()
+    .sort((a, b) => Number(b.isPinned) - Number(a.isPinned));
+
   return (
     <StyledApp $isDark={options?.isDark}>
       <Header />
@@ -100,7 +105,7 @@ const App: React.FC<{}> = () => {
           Save Session
         </Button>
         <Sessions>
-          {sessions.map((session) => (
+          {sortedSessions.map((session) => (
             <SessionCard
               key={session.id}
               session={session}

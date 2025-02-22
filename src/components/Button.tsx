@@ -6,7 +6,7 @@ import { useOptions } from "../contexts/options/optionsContextProvider";
 const typeStyles: Record<ButtonTypes, string> = {
   icon: "padding: 0.5em;",
   action:
-    "padding: 1em 2em; background: #89A8B2; color: #000000; text-align: center; box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px; font-weight: 700;",
+    "padding: 1em 2em; background: #76ABAE; color: #000000; text-align: center; box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px; font-weight: 700;",
   delete: `
     padding: 0.5em;
     &:hover {
@@ -59,7 +59,10 @@ const StyledButton = styled.button<{
 
   & svg {
     color: ${(props) => props.$isDark && props.theme.colors.darkmode[400]};
+    height: 1.05rem;
+    width: auto;
   }
+
   ${(props) => props.$buttonType && typeStyles[props.$buttonType]}
 `;
 

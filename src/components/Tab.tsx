@@ -27,8 +27,7 @@ const StyledTab = styled.div<{ $isDark?: boolean }>`
 
   &:hover {
     /* background-color: rgba(232, 22, 22, 0.1); */
-    background-color: ${(props) =>
-      props.$isDark ? props.theme.colors.darkmode[300] : "#b3c8cf"};
+    background-color: ${(props) => props.theme.colors.darkmode[300]};
   }
 `;
 

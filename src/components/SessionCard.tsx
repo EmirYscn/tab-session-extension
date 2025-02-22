@@ -5,6 +5,8 @@ import { IoIosArrowDown } from "react-icons/io";
 import { BiWindowOpen } from "react-icons/bi";
 import { IoTrashBinOutline } from "react-icons/io5";
 import { LuPlus } from "react-icons/lu";
+import { GrMultiple } from "react-icons/gr";
+import { RiPushpinLine } from "react-icons/ri";
 
 import {
   LocalStorageOptions,
@@ -72,10 +74,6 @@ const Input = styled.input<{ $isDark?: boolean }>`
       : props.theme.colors.grey[800]};
   color: ${(props) =>
     props.$isDark ? props.theme.colors.darkmode[400] : "black"};
-
-  & svg {
-    height: 1rem;
-  }
 `;
 
 type SessionCardProps = {
@@ -144,6 +142,25 @@ function SessionCard({
     setIsAddingNewTab((isAdding) => !isAdding);
   }
 
+  function handleOpenAllTabs() {
+    const tabs = session.tabs;
+    for (const tab of tabs) {
+      chrome.tabs.create({ url: tab.url, active: false });
+    }
+  }
+
+  function handlePin(e: MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    setSessions((prevSessions) => {
+      const updatedSessions = prevSessions.map((prev) =>
+        prev.id === session.id ? { ...prev, isPinned: !prev.isPinned } : prev
+      );
+      setSessionsStorage(updatedSessions);
+      return updatedSessions;
+    });
+  }
+
   return (
     <>
       <StyledSessionCard
@@ -182,14 +199,16 @@ function SessionCard({
           <Details>
             <span>{`${tabsCount} tabs`}</span>
             <Actions>
-              <Button onClick={setExpandedId}>
-                <IoIosArrowDown />
-              </Button>
               <Button onClick={(e) => handleAddTab(e)}>
                 <LuPlus />
               </Button>
-              <Button buttonType="open">
-                <BiWindowOpen />
+              <Button buttonType="open" onClick={handleOpenAllTabs}>
+                <GrMultiple />
+              </Button>
+              <Button onClick={handlePin}>
+                <RiPushpinLine
+                  style={session.isPinned ? { color: "#FC2947" } : {}}
+                />
               </Button>
               <Button
                 onClick={(e: MouseEvent) => handleDeleteSession(e, session.id)}

@@ -7,6 +7,8 @@ export type Session = {
   id: string;
   name: string;
   tabs: Tab[];
+  isPinned: boolean;
+  tags?: string[];
 };
 
 export type Tab = {
