@@ -15,6 +15,7 @@ import SessionCard from "../components/SessionCard";
 import Header from "../components/Header";
 import Button from "../components/Button";
 import { useOptions } from "../contexts/options/optionsContextProvider";
+import SortBy from "./SortBy";
 
 const StyledApp = styled.div<{ $isDark?: boolean }>`
   width: 520px;
@@ -38,7 +39,7 @@ const Main = styled.div`
   flex-direction: column;
   gap: 1rem;
   padding: 1rem;
-  overflow-y: scroll;
+  overflow-y: auto;
 `;
 
 const Sessions = styled.div`
@@ -70,10 +71,11 @@ const App: React.FC<{}> = () => {
       name: new Date().toDateString(),
       tabs: formattedTabs,
       isPinned: false,
+      date: new Date().toISOString(),
     };
 
     setSessions((prevSessions) => {
-      const updatedSessions = [newSession, ...prevSessions];
+      const updatedSessions = [...prevSessions, newSession];
       setSessionsStorage(updatedSessions);
       return updatedSessions;
     });
@@ -93,14 +95,41 @@ const App: React.FC<{}> = () => {
     getOptionsFromStore();
   }, []);
 
-  const sortedSessions = sessions
-    .slice()
-    .sort((a, b) => Number(b.isPinned) - Number(a.isPinned));
+  // 1) FILTER
+  // TODO: filter by tags
+
+  // 2) SORT
+  const [field, direction] = options.sort?.split("-") as [string, string];
+  const modifier = direction === "asc" ? 1 : -1;
+
+  let sortedSessions = [...sessions].sort((a, b) => {
+    if (field === "tab") {
+      return (b.tabs.length - a.tabs.length) * modifier;
+    } else if (field === "date") {
+      return (
+        (new Date(a.date!).getTime() - new Date(b.date!).getTime()) * modifier
+      );
+    }
+    return 0;
+  });
+
+  // sort pinned sessions first
+  sortedSessions = sortedSessions.sort(
+    (a, b) => Number(b.isPinned) - Number(a.isPinned)
+  );
 
   return (
     <StyledApp $isDark={options?.isDark}>
       <Header />
       <Main>
+        <SortBy
+          options={[
+            { value: "date-asc", label: "Oldest" },
+            { value: "date-desc", label: "Newest" },
+            { value: "tab-asc", label: "Most Tabs" },
+            { value: "tab-desc", label: "Fewest Tabs" },
+          ]}
+        />
         <Button buttonType="action" onClick={getCurrentTabs}>
           Save Session
         </Button>

@@ -1,13 +1,15 @@
 import React, { useContext, useEffect, useState } from "react";
-import { getStoredOptions, LocalStorageOptions } from "../../services/storage";
+import {
+  defaultOptions,
+  getStoredOptions,
+  LocalStorageOptions,
+} from "../../services/storage";
 import { OptionsContext } from "./optionsContext";
 
 // Provider Component
 
 export function OptionsProvider({ children }: { children: React.ReactNode }) {
-  const [options, setOptions] = useState<LocalStorageOptions>({
-    isDark: false,
-  });
+  const [options, setOptions] = useState<LocalStorageOptions>(defaultOptions);
 
   // Load options from Chrome storage when the component mounts
   useEffect(() => {
@@ -16,18 +18,6 @@ export function OptionsProvider({ children }: { children: React.ReactNode }) {
       setOptions(storedOptions);
     }
     fetchOptions();
-
-    // Listen for changes in Chrome storage and update state
-    // chrome.storage.onChanged.addListener((changes, areaName) => {
-    //   if (areaName === "local" && changes.options) {
-    //     setOptions(changes.options.newValue);
-    //   }
-    // });
-
-    // Cleanup listener on unmount
-    // return () => {
-    //   chrome.storage.onChanged.removeListener(() => {});
-    // };
   }, []);
 
   return (

@@ -10,7 +10,10 @@ function ToggleDarkMode() {
 
   function handleToggle() {
     setOptions((prevOptions) => {
-      const newOptions = { ...prevOptions, isDark: !prevOptions.isDark };
+      const newOptions = {
+        ...prevOptions,
+        isDark: !prevOptions.isDark,
+      };
       setStoredOptions(newOptions); // Save to Chrome storage
       return newOptions;
     });

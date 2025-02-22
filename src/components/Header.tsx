@@ -18,7 +18,7 @@ const StyledHeader = styled.div<{ $isDark?: boolean }>`
         ? props.theme.colors.darkmode[400]
         : props.theme.colors.grey[0]};
   padding-bottom: 0.5rem;
-  margin-bottom: 1rem;
+  /* margin-bottom: 1rem; */
 `;
 
 const Actions = styled.div`

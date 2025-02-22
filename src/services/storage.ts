@@ -9,6 +9,7 @@ export type Session = {
   tabs: Tab[];
   isPinned: boolean;
   tags?: string[];
+  date: string;
 };
 
 export type Tab = {
@@ -20,24 +21,17 @@ export type Tab = {
 
 export type LocalStorageOptions = {
   isDark: boolean;
+  sort?: SortTypes;
 };
+
+export type SortTypes = "date-asc" | "date-desc" | "tab-asc" | "tab-desc";
 
 export type LocalStorageKeys = keyof LocalStorage;
 
-// const initialState: Session[] = [
-//   {
-//     name: "Tue 19 2025",
-//     tabs: [{ icon: "lala", url: "lala" }],
-//   },
-//   {
-//     name: "Tue 15 2025",
-//     tabs: [{ icon: "lala", url: "lala" }],
-//   },
-//   {
-//     name: "Tue 10 2025",
-//     tabs: [{ icon: "lala", url: "lala" }],
-//   },
-// ];
+export const defaultOptions: LocalStorageOptions = {
+  isDark: false,
+  sort: "date-desc",
+};
 
 export async function setSessionsStorage(sessions: Session[]): Promise<void> {
   const vals: LocalStorage = {
@@ -74,7 +68,7 @@ export function getStoredOptions(): Promise<LocalStorageOptions> {
 
   return new Promise((resolve) => {
     chrome.storage.local.get(keys, (res: { [key: string]: any }) => {
-      resolve(res.options ?? { isDark: true });
+      resolve(res.options ?? defaultOptions);
     });
   });
 }

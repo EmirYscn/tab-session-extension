@@ -1,23 +1,19 @@
 import React, { useRef, useState } from "react";
 
 import styled from "styled-components";
-import { IoIosArrowDown } from "react-icons/io";
-import { BiWindowOpen } from "react-icons/bi";
 import { IoTrashBinOutline } from "react-icons/io5";
 import { LuPlus } from "react-icons/lu";
 import { GrMultiple } from "react-icons/gr";
 import { RiPushpinLine } from "react-icons/ri";
+import { LuTag } from "react-icons/lu";
 
-import {
-  LocalStorageOptions,
-  Session,
-  setSessionsStorage,
-} from "../services/storage";
+import { Session, setSessionsStorage } from "../services/storage";
 import Button from "./Button";
 
 import Tabs from "./Tabs";
 import { ChangeEvent, MouseEvent } from "../types/types";
 import { useOptions } from "../contexts/options/optionsContextProvider";
+import { formatString } from "../utils/formatString";
 
 const StyledSessionCard = styled.div<{ $isDark?: boolean }>`
   background-color: ${(props) =>
@@ -76,6 +72,24 @@ const Input = styled.input<{ $isDark?: boolean }>`
     props.$isDark ? props.theme.colors.darkmode[400] : "black"};
 `;
 
+const Tags = styled.div`
+  display: flex;
+  gap: 5px;
+  margin-top: 8px;
+  overflow-x: auto;
+  white-space: nowrap;
+  max-width: 100%;
+  padding-bottom: 4px; /* Optional: For better scrollbar visibility */
+`;
+
+const Tag = styled.span`
+  background-color: ${(props) => props.theme.colors.darkmode[300]};
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  flex-shrink: 0; /* Prevents tags from shrinking in flex container */
+`;
+
 type SessionCardProps = {
   session: Session;
   isExpanded: boolean;
@@ -89,12 +103,45 @@ function SessionCard({
   setExpandedId,
   setSessions,
 }: SessionCardProps) {
-  const { options, setOptions } = useOptions();
+  const { options } = useOptions();
   const [isEditing, setIsEditing] = useState(false);
+
+  const [isAddingTag, setIsAddingTag] = useState(false);
+  const [newTag, setNewTag] = useState("");
   const [isAddingNewTab, setIsAddingNewTab] = useState(false);
+  const [tags, setTags] = useState(session.tags || []);
+
   const [value, setValue] = useState(session.name);
   const inputRef = useRef<HTMLInputElement>(null);
   const tabsCount = session.tabs.length;
+
+  function handleAddTag(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Enter" && newTag.trim()) {
+      const updatedTags = [...tags, newTag.trim()];
+      setTags(updatedTags);
+      updateSessionTags(updatedTags);
+      setNewTag("");
+      setIsAddingTag(false);
+    }
+  }
+
+  // Handles tag removal
+  function handleRemoveTag(tagToRemove: string) {
+    const updatedTags = tags.filter((tag) => tag !== tagToRemove);
+    setTags(updatedTags);
+    updateSessionTags(updatedTags);
+  }
+
+  // Updates session tags in storage
+  function updateSessionTags(updatedTags: string[]) {
+    setSessions((prevSessions) => {
+      const updatedSessions = prevSessions.map((prev) =>
+        prev.id === session.id ? { ...prev, tags: updatedTags } : prev
+      );
+      setSessionsStorage(updatedSessions);
+      return updatedSessions;
+    });
+  }
 
   function handleEdit(e: ChangeEvent) {
     setValue(e.target.value);
@@ -171,6 +218,20 @@ function SessionCard({
         }}
         $isDark={options.isDark}
       >
+        <Tags>
+          {tags.map((tag) => (
+            <Tag
+              key={tag}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleRemoveTag(tag);
+              }}
+            >
+              {formatString(tag, 6)} ✖
+            </Tag>
+          ))}
+        </Tags>
         <Card>
           {isEditing ? (
             <Input
@@ -202,6 +263,16 @@ function SessionCard({
               <Button onClick={(e) => handleAddTab(e)}>
                 <LuPlus />
               </Button>
+              <Button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setIsAddingTag(!isAddingTag);
+                }}
+              >
+                <LuTag />
+              </Button>
+
               <Button buttonType="open" onClick={handleOpenAllTabs}>
                 <GrMultiple />
               </Button>
@@ -226,6 +297,17 @@ function SessionCard({
           setSessions={setSessions}
           isAddingNewTab={isAddingNewTab}
           setIsAddingNewTab={setIsAddingNewTab}
+        />
+      )}
+      {isAddingTag && (
+        <Input
+          type="text"
+          value={newTag}
+          onChange={(e) => setNewTag(e.target.value)}
+          onKeyDown={handleAddTag}
+          placeholder="Add a tag..."
+          autoFocus
+          $isDark={options.isDark}
         />
       )}
     </>
