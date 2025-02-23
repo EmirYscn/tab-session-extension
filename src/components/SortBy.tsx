@@ -1,17 +1,13 @@
-import styled from "styled-components";
 import Select from "./Select";
-import { ChangeEvent } from "../types/types";
 import { useOptions } from "../contexts/options/optionsContextProvider";
+
+import { ChangeEvent } from "../types/types";
 import { setStoredOptions, SortTypes } from "../services/storage";
 
 export type Options = {
   value: string;
   label: string;
 };
-
-// const StyledSortBy = styled.div`
-//   align-self: flex-end;
-// `;
 
 function SortBy({ options }: { options: Options[] }) {
   const { options: storeOptions, setOptions } = useOptions();

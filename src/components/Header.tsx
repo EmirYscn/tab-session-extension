@@ -1,14 +1,12 @@
-import React from "react";
 import styled from "styled-components";
-
-import { IconContext } from "react-icons";
 import { IoSettingsOutline } from "react-icons/io5";
+
 import Button from "./Button";
 import ToggleDarkMode from "./ToggleDarkMode";
+
 import { useOptions } from "../contexts/options/optionsContextProvider";
 
 const StyledHeader = styled.div<{ $isDark?: boolean }>`
-  /* padding: 1rem; */
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -17,8 +15,7 @@ const StyledHeader = styled.div<{ $isDark?: boolean }>`
       props.$isDark
         ? props.theme.colors.darkmode[400]
         : props.theme.colors.grey[0]};
-  padding-bottom: 0.5rem;
-  /* margin-bottom: 1rem; */
+  padding: 0.8rem 1rem;
 `;
 
 const Actions = styled.div`

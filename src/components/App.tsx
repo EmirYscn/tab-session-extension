@@ -13,15 +13,17 @@ import {
 
 import SessionCard from "../components/SessionCard";
 import Header from "../components/Header";
-import Button from "../components/Button";
-import { useOptions } from "../contexts/options/optionsContextProvider";
+
 import SortBy from "./SortBy";
 import FilterBy from "./FilterBy";
+import AddButton from "./AddButton";
+
+import { useOptions } from "../contexts/options/optionsContextProvider";
 import { formatString } from "../utils/formatString";
 
 const StyledApp = styled.div<{ $isDark?: boolean }>`
   width: 520px;
-  height: 612px;
+  height: 600px;
   background-color: ${(props) =>
     props.$isDark
       ? props.theme.colors.darkmode[200]
@@ -42,12 +44,14 @@ const Main = styled.div`
   gap: 1rem;
   padding: 1rem;
   overflow-y: auto;
+  position: relative;
+  scrollbar-gutter: stable;
 `;
 
 const Sessions = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.8rem;
 `;
 
 const Actions = styled.div`
@@ -58,14 +62,14 @@ const Actions = styled.div`
 
 const SearchTags = styled.div`
   display: flex;
-  flex-wrap: wrap; /* Allows tags to wrap within the container */
+  flex-wrap: wrap;
   gap: 5px;
   margin-top: 8px;
   max-width: 100%;
   padding-bottom: 4px;
   align-items: center;
-  overflow-x: auto; /* Enables horizontal scrolling if necessary */
-  overflow-y: hidden; /* Prevents vertical scrolling */
+  overflow-x: auto;
+  overflow-y: hidden;
 `;
 
 const Tag = styled.span`
@@ -73,8 +77,8 @@ const Tag = styled.span`
   padding: 4px 8px;
   border-radius: 4px;
   cursor: pointer;
-  flex-shrink: 0; /* Prevents tags from shrinking */
-  white-space: nowrap; /* Ensures text inside the tag doesn’t wrap */
+  flex-shrink: 0;
+  white-space: nowrap;
   max-width: 100%;
   text-overflow: ellipsis;
   display: inline-block;
@@ -94,9 +98,9 @@ const App: React.FC<{}> = () => {
 
     const formattedTabs = tabs.map((tab) => ({
       id: uuidv4(),
-      icon: tab.favIconUrl || "", // Handle undefined favIconUrl
+      icon: tab.favIconUrl || "",
       title: tab.title || "",
-      url: tab.url || "", // Handle undefined url
+      url: tab.url || "",
     }));
 
     const newSession: Session = {
@@ -197,25 +201,25 @@ const App: React.FC<{}> = () => {
             ]}
           />
         </Actions>
-        <div>
-          <SearchTags>
-            {searchTags.map((tag, index) => (
-              <Tag
-                key={index}
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  handleRemoveSearchTag(tag);
-                }}
-              >
-                {formatString(tag, 6)} ✖
-              </Tag>
-            ))}
-          </SearchTags>
-        </div>
-        <Button buttonType="action" onClick={getCurrentTabs}>
-          Save Session
-        </Button>
+        {searchTags.length > 0 && (
+          <div>
+            <SearchTags>
+              {searchTags.map((tag, index) => (
+                <Tag
+                  key={index}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleRemoveSearchTag(tag);
+                  }}
+                >
+                  {formatString(tag, 6)} ✖
+                </Tag>
+              ))}
+            </SearchTags>
+          </div>
+        )}
+        <AddButton onClick={getCurrentTabs}>Save Session</AddButton>
         <Sessions>
           {sortedSessions.map((session) => (
             <SessionCard

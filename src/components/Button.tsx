@@ -1,6 +1,6 @@
-import React, { useEffect } from "react";
+import React from "react";
 import styled from "styled-components";
-import { getStoredOptions } from "../services/storage";
+
 import { useOptions } from "../contexts/options/optionsContextProvider";
 
 const typeStyles: Record<ButtonTypes, string> = {
@@ -30,9 +30,6 @@ const StyledButton = styled.button<{
   border: none;
   border-radius: 6px;
   background: none;
-  /* display: flex;
-  align-items: center;
-  justify-content: space-between; */
   transition: all 0.15s ease-in-out;
   transform-origin: center;
 
@@ -48,9 +45,9 @@ const StyledButton = styled.button<{
   &:active {
     border: none;
     outline: none;
-    transform: scale(0.96); /* Slight shrink effect */
+    transform: scale(0.96);
     box-shadow: rgba(50, 50, 93, 0.15) 0px 3px 6px -2px,
-      rgba(0, 0, 0, 0.2) 0px 2px 4px -3px; /* Softer shadow */
+      rgba(0, 0, 0, 0.2) 0px 2px 4px -3px;
   }
 
   &:focus {
@@ -75,8 +72,7 @@ type ButtonProps = {
 };
 
 function Button({ children, onClick, buttonType = "icon" }: ButtonProps) {
-  const { options, setOptions } = useOptions();
-
+  const { options } = useOptions();
   return (
     <StyledButton
       onClick={onClick}

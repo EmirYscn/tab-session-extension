@@ -1,17 +1,20 @@
 import styled from "styled-components";
 import { FaRegWindowMaximize } from "react-icons/fa";
 import { IoTrashBinOutline } from "react-icons/io5";
-import { MdModeEdit } from "react-icons/md";
 
-import { formatString } from "../utils/formatString";
-import { Session, setSessionsStorage, Tab } from "../services/storage";
 import Button from "./Button";
+
+import {
+  Session,
+  setSessionsStorage,
+  Tab as TabType,
+} from "../services/storage";
+import { formatString } from "../utils/formatString";
 import { useOptions } from "../contexts/options/optionsContextProvider";
 
 const StyledTab = styled.div<{ $isDark?: boolean }>`
   display: flex;
   align-items: center;
-  /* gap: 0.5rem; */
   justify-content: space-between;
   padding: 0 0.3em;
   border-radius: 6px;
@@ -26,7 +29,6 @@ const StyledTab = styled.div<{ $isDark?: boolean }>`
   }
 
   &:hover {
-    /* background-color: rgba(232, 22, 22, 0.1); */
     background-color: ${(props) => props.theme.colors.darkmode[300]};
   }
 `;
@@ -48,7 +50,7 @@ const TabDetails = styled.div`
 `;
 
 type TabProps = {
-  tab: Tab;
+  tab: TabType;
   session: Session;
   setSessions: React.Dispatch<React.SetStateAction<Session[]>>;
 };
@@ -79,9 +81,6 @@ function Tab({ tab, setSessions }: TabProps) {
         <span>{formatString(tab.title, 40)}</span>
       </TabDetails>
       <TabActions>
-        <Button buttonType="open">
-          <MdModeEdit />
-        </Button>
         <Button buttonType="delete" onClick={() => handleDeleteTab(tab.id)}>
           <IoTrashBinOutline />
         </Button>

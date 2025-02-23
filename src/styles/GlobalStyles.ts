@@ -38,6 +38,8 @@ export const GlobalStyles = createGlobalStyle`
     --color-darkmode-200: #31363F;
     --color-darkmode-300: #76ABAE;
     --color-darkmode-400: #EEEEEE;
+    
+  
 
     --backdrop-color: rgba(0, 0, 0, 0.3);
 

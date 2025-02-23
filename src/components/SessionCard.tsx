@@ -6,12 +6,13 @@ import { LuPlus } from "react-icons/lu";
 import { GrMultiple } from "react-icons/gr";
 import { RiPushpinLine } from "react-icons/ri";
 import { LuTag } from "react-icons/lu";
+import { FaTag } from "react-icons/fa6";
 
-import { Session, setSessionsStorage } from "../services/storage";
 import Button from "./Button";
-
 import Tabs from "./Tabs";
+
 import { ChangeEvent, MouseEvent } from "../types/types";
+import { Session, setSessionsStorage } from "../services/storage";
 import { useOptions } from "../contexts/options/optionsContextProvider";
 import { formatString } from "../utils/formatString";
 
@@ -26,8 +27,13 @@ const StyledSessionCard = styled.div<{ $isDark?: boolean }>`
   flex-direction: column;
   padding: 1rem 1.5rem;
 
-  box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
-    rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
+  /* box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
+    rgba(60, 64, 67, 0.15) 0px 2px 6px 2px; */
+
+  box-shadow: ${(props) =>
+    props.$isDark
+      ? "rgba(99, 100, 100, 0.3) 0px 1px 2px 0px, rgba(99, 100, 100, 0.15) 0px 2px 6px 2px"
+      : "rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px"};
   z-index: 99999;
   cursor: pointer;
 `;
@@ -75,19 +81,20 @@ const Input = styled.input<{ $isDark?: boolean }>`
 const Tags = styled.div`
   display: flex;
   gap: 5px;
-  margin-top: 8px;
-  overflow-x: auto;
-  white-space: nowrap;
+  flex-wrap: wrap;
   max-width: 100%;
-  padding-bottom: 4px; /* Optional: For better scrollbar visibility */
+  padding-bottom: 4px;
 `;
 
 const Tag = styled.span`
   background-color: ${(props) => props.theme.colors.darkmode[300]};
   padding: 4px 8px;
-  border-radius: 4px;
+  border-radius: 12px;
   cursor: pointer;
-  flex-shrink: 0; /* Prevents tags from shrinking in flex container */
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 2px;
 `;
 
 type SessionCardProps = {
@@ -121,7 +128,7 @@ function SessionCard({
       const updatedTags = new Set(tags);
       updatedTags.add(formattedTag);
 
-      setTags(Array.from(updatedTags)); // Convert the Set back to an array to update state
+      setTags(Array.from(updatedTags));
       updateSessionTags(Array.from(updatedTags));
 
       setNewTag("");
@@ -236,6 +243,7 @@ function SessionCard({
                   handleRemoveTag(tag);
                 }}
               >
+                <FaTag />
                 {formatString(tag, 6)} ✖
               </Tag>
             ))}

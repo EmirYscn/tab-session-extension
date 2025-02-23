@@ -14,7 +14,7 @@ function ToggleDarkMode() {
         ...prevOptions,
         isDark: !prevOptions.isDark,
       };
-      setStoredOptions(newOptions); // Save to Chrome storage
+      setStoredOptions(newOptions);
       return newOptions;
     });
   }

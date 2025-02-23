@@ -1,6 +1,17 @@
 import { useState } from "react";
 import styled from "styled-components";
+import { IoSearch } from "react-icons/io5";
+
+import Button from "./Button";
+
 import { useOptions } from "../contexts/options/optionsContextProvider";
+
+const Wrapper = styled.div`
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
 
 const Input = styled.input<{ $isDark?: boolean }>`
   padding: 0.5rem 0.6rem;
@@ -30,6 +41,7 @@ type FilterByProps = {
 function FilterBy({ addSearchTag }: FilterByProps) {
   const { options } = useOptions();
   const [inputValue, setInputValue] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (!inputValue) return;
@@ -43,14 +55,24 @@ function FilterBy({ addSearchTag }: FilterByProps) {
   }
 
   return (
-    <Input
-      type="text"
-      value={inputValue}
-      placeholder="Filter by tag"
-      onChange={(e) => setInputValue(e.target.value)}
-      onKeyDown={handleKeyDown}
-      $isDark={options.isDark}
-    />
+    <Wrapper>
+      {isOpen ? (
+        <Input
+          type="text"
+          value={inputValue}
+          placeholder="Search by tag"
+          onChange={(e) => setInputValue(e.target.value)}
+          onKeyDown={handleKeyDown}
+          $isDark={options.isDark}
+          onBlur={() => setIsOpen(false)}
+          autoFocus
+        />
+      ) : (
+        <Button onClick={() => setIsOpen(true)}>
+          <IoSearch />
+        </Button>
+      )}
+    </Wrapper>
   );
 }
 

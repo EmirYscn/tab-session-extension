@@ -6,9 +6,6 @@ const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 module.exports = {
   entry: {
     popup: path.resolve("src/popup/popup.tsx"),
-    options: path.resolve("src/options/options.tsx"),
-    background: path.resolve("src/background/background.ts"),
-    contentScript: path.resolve("src/contentScript/contentScript.tsx"),
   },
   module: {
     rules: [
@@ -57,7 +54,7 @@ module.exports = {
         },
       ],
     }),
-    ...getHtmlPlugins(["popup", "options"]),
+    ...getHtmlPlugins(["popup"]),
   ],
   output: {
     filename: "[name].js",
@@ -76,7 +73,7 @@ function getHtmlPlugins(chunks) {
   return chunks.map(
     (chunk) =>
       new HtmlPlugin({
-        title: "Weather Extension",
+        title: "Tab Session Extension",
         filename: `${chunk}.html`,
         chunks: [chunk],
       })

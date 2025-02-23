@@ -1,5 +1,7 @@
 import styled from "styled-components";
+
 import { Options } from "./SortBy";
+
 import { useOptions } from "../contexts/options/optionsContextProvider";
 import { ChangeEvent } from "../types/types";
 import { SortTypes } from "../services/storage";

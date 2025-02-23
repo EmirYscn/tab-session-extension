@@ -1,12 +1,12 @@
 {
-  "name": "Tab Session",
+  "name": "Tab Session Extension",
   "version": "1.0.0",
   "description": "Tab Session Extension",
   "scripts": {
     "start": "webpack --watch --progress --config webpack.dev.js",
     "build": "webpack --watch --progress --config webpack.prod.js"
   },
-  "author": "",
+  "author": "EmirYscn",
   "devDependencies": {
     "@babel/core": "^7.26.9",
     "@babel/preset-env": "^7.26.9",

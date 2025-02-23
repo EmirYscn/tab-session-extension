@@ -1,20 +1,18 @@
+import { useState } from "react";
 import styled from "styled-components";
 import { v4 as uuidv4 } from "uuid";
-
 import { motion } from "framer-motion";
-
 import { IoMdCheckmark } from "react-icons/io";
 import { RxCross2 } from "react-icons/rx";
 
+import Button from "./Button";
+import Tab from "./Tab";
+
 import {
-  LocalStorageOptions,
   Session,
   setSessionsStorage,
   Tab as TabType,
 } from "../services/storage";
-import Tab from "./Tab";
-import Button from "./Button";
-import { useState } from "react";
 import { useOptions } from "../contexts/options/optionsContextProvider";
 
 const StyledTabs = styled(motion.div)<{ $isDark?: boolean }>`
@@ -22,7 +20,7 @@ const StyledTabs = styled(motion.div)<{ $isDark?: boolean }>`
   flex-direction: column;
   gap: 0.5rem;
   height: 215px;
-  overflow-y: scroll;
+  overflow-y: auto;
   margin: -1rem 0.8rem;
   background-color: ${(props) =>
     props.$isDark
@@ -38,7 +36,6 @@ const StyledTabs = styled(motion.div)<{ $isDark?: boolean }>`
 
 const InputTab = styled.div`
   display: flex;
-  /* grid-template-columns: 1fr auto auto; */
   justify-content: space-between;
   align-items: center;
   gap: 0.5rem;
